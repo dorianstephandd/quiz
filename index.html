@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Super Quiz Niveau Facile</title>
+<style>
+  body{margin:0;padding:0;min-height:100vh;display:flex;justify-content:center;align-items:center;background:#1f2933;font-family:Arial,sans-serif;color:#fff;}
+  .box{width:700px;max-width:95%;background:#111827;padding:40px;border-radius:12px;text-align:center;}
+  h1{font-size:2.4rem;margin-bottom:30px;}
+  h2{font-size:1.6rem;margin-bottom:25px;}
+  button{width:100%;padding:15px;margin:10px 0;font-size:1.2rem;border:none;border-radius:8px;cursor:pointer;background:#374151;color:#fff;transition:0.2s;}
+  button:hover{background:#6366f1;}
+  .start{background:#10b981;}
+  .start:hover{background:#059669;}
+  .restart{background:#f59e0b;}
+  .restart:hover{background:#d97706;}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="box">
+  <!-- Page d'accueil -->
+  <div id="home">
+    <h1>Super Quiz Niveau Facile</h1>
+    <button class="start" onclick="startQuiz()">Démarrer</button>
+  </div>
+
+  <!-- Page du quiz -->
+  <div id="quiz" class="hidden">
+    <h2 id="question"></h2>
+    <div id="answers"></div>
+  </div>
+
+  <!-- Page de résultat -->
+  <div id="result" class="hidden">
+    <h2 id="score"></h2>
+    <button class="restart" onclick="restartQuiz()">Recommencer</button>
+  </div>
+</div>
+
+<script>
+// --- Tous les quiz ---
+var quizzes = {
+  "astro1":[
+    {q:"Lorsque le Soleil est mal aspecté et/ou se trouve en exil dans son signe, la personne sera sujette :",a:["Au bavardage incessant","À la superficialité","Au manque d'identité","À l'hypersensibilité"],c:2},
+    {q:"Lorsque l'on étudie Neptune, on explore le domaine en lien avec :",a:["L'expansion","L'inconscient","Les transformations","Les grands idéaux"],c:3},
+    {q:"Le fond du ciel est associé principalement :",a:["Aux relations de couple","À la vocation","Aux racines d'une personne","Au développement de la personnalité"],c:2},
+    {q:"Dans cette liste, quel mot est associé à l'élément haut ?",a:["Rapide","Combatif","Sensible","Neutre"],c:2},
+    {q:"La zone diurne correspond :",a:["Aux zones au-dessus de la ligne d'horizon","Aux zones en dessous de la ligne d'horizon","À la ligne d'horizon","À la courbe symbolique de la Terre"],c:0},
+    {q:"Quelle planète est une planète collective ?",a:["Soleil","Vénus","Saturne","Mars"],c:2},
+    {q:"Mot lié à l'énergie du Lion ?",a:["Théâtral","Philosophe","Curieux","Pionnier"],c:0},
+    {q:"La maison 7 correspond au secteur :",a:["Vocations","Connexion spirituelle","Possessions","Relations amoureuses"],c:3},
+    {q:"Mars est lié principalement à :",a:["Volonté","Mental","Action","Intuition"],c:2},
+    {q:"Mot lié à l'énergie de la Balance ?",a:["Psychologie","Compromis","Innovation","Être solaire"],c:1}
+  ]
+  // Tu pourras ajouter astro2, astro3 ... astro41 de la même manière
+};
+
+// --- Récupérer le quiz depuis l'URL ---
+function getQuizFromURL(){
+  var params = new URLSearchParams(window.location.search);
+  var q = params.get("quiz");
+  return quizzes[q] ? quizzes[q] : quizzes["astro1"];
+}
+
+var currentQuiz = getQuizFromURL();
+var currentQuestion = 0;
+var score = 0;
+
+// --- Fonctions du quiz ---
+function startQuiz(){
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  showQuestion();
+}
+
+function showQuestion(){
+  var q = currentQuiz[currentQuestion];
+  document.getElementById("question").textContent = q.q;
+  var answersDiv = document.getElementById("answers");
+  answersDiv.innerHTML = "";
+  for(var i=0;i<q.a.length;i++){
+    var btn = document.createElement("button");
+    btn.textContent = q.a[i];
+    btn.onclick = (function(i){return function(){checkAnswer(i);};})(i);
+    answersDiv.appendChild(btn);
+  }
+}
+
+function checkAnswer(i){
+  if(i===currentQuiz[currentQuestion].c) score++;
+  currentQuestion++;
+  if(currentQuestion<currentQuiz.length) showQuestion();
+  else showResult();
+}
+
+function showResult(){
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+  var percent = Math.round((score/currentQuiz.length)*100);
+  document.getElementById("score").textContent =
+    percent>=80 ? "Félicitations ! Score : "+percent+" %. Vous pouvez tenter le niveau modéré." :
+    "Mince, c'est raté. Score : "+percent+" %. Vous pouvez réessayer, vous allez y arriver.";
+}
+
+function restartQuiz(){
+  currentQuestion=0;
+  score=0;
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
